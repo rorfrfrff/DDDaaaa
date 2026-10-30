@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>時空貿易商：代數與幾何的冒險</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --accent: #e67e22;
+            --success: #2ecc71;
+            --danger: #e74c3c;
+            --light: #ecf0f1;
+        }
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'PingFang TC', 'Microsoft JhengHei', sans-serif;
+            background: linear-gradient(135deg, #1e272e, #2c3e50);
+            color: #fff;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .game-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            width: 100%;
+            max-width: 600px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .hud {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+            background: rgba(0,0,0,0.3);
+            padding: 10px 15px;
+            border-radius: 8px;
+        }
+        .progress-bar-container {
+            background: #34495e;
+            height: 10px;
+            border-radius: 5px;
+            margin-bottom: 25px;
+            overflow: hidden;
+        }
+        .progress-bar {
+            background: var(--accent);
+            width: 0%;
+            height: 100%;
+            transition: width 0.3s ease;
+        }
+        .story-box {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 15px;
+            border-left: 5px solid var(--accent);
+            margin-bottom: 20px;
+            font-style: italic;
+            line-height: 1.6;
+        }
+        .question-box {
+            font-size: 1.3rem;
+            margin-bottom: 25px;
+            font-weight: bold;
+            line-height: 1.5;
+        }
+        .options-container { display: flex; flex-direction: column; gap: 12px; }
+        .option-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            padding: 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            text-align: left;
+            transition: all 0.2s ease;
+        }
+        .option-btn:hover:not(:disabled) {
+            background: var(--accent);
+            border-color: var(--accent);
+            transform: translateY(-2px);
+        }
+        .option-btn:disabled { cursor: default; opacity: 0.75; }
+        .feedback {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            font-weight: bold;
+            display: none;
+            text-align: center;
+            line-height: 1.6;
+        }
+        .feedback.correct { background: var(--success); display: block; }
+        .feedback.wrong { background: var(--danger); display: block; }
+        .next-btn {
+            display: none;
+            width: 100%;
+            background: #2980b9;
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            margin-top: 20px;
+            font-weight: bold;
+        }
+        .next-btn:hover { background: #3498db; }
+        .screen { display: none; }
+        .screen.active { display: block; }
+        .center { text-align: center; }
+        .restart-btn {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1.2rem;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        button:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
+        @media (max-width: 480px) {
+            body { padding: 12px; }
+            .game-container { padding: 20px; }
+            .hud { font-size: 1rem; }
+            .question-box { font-size: 1.15rem; }
+        }
+    </style>
+<script type='text/javascript' src='https://private-us-east-1.manuscdn.com/DPdwqg8ixJoAtQhF_79an-1nZCs0iZqlENmw1p8UQF-uvH26LCTxQaq_bEcUSKII2Vo67D9jOJySq5DOk48KPOcB4B--d304A4un0_Ah7uVjS-s9SVkvxqI4yJhSx7fp54ZrlRBqZYcqsLNnhEL9yNSOYkxybl5bR7ENplxK9G7gzuZydmLbfJTAi6BBZMIE79M2g0CjtaHe_NuzmkfmU1M7mukFaSkExkuk5U0RiIXWoGfKFoeLLcwv2ME485RqJBUDzjeXxjP3qu-FeSzWL8c7QmZAgAk6OHg3vGCY2gcP9IGnZrMgwhiqW8khimHgdLX73luXbs9puZCbBwNjWG3VkJRH0P69K-8amwKwgOdW-9Ye-YdLX62tbYZi2SGPKpGPirzL-9V-wT-ku6eNc67rsgs_czWZ4eUJ6VNPjozHMB3F-ghYHoN_wIaoTgmF-bk4Cx6tFQTYTShHsd4CZ-kUgCHqODyHehPDcjN-veu-4LvVMA6JrPyP7o1LEQax6uwMNRTav3FR4bqvNRPMJJLmhIBg6tQ0wDP47LKNTen9CYzYkz1SG-eoeXM_NMVMQi_Ht8QTCSNTQAYaf7VMEr2lKeFVWRBRf-_0U7675I_H9ccPWu95b8uafbShX1GLtTnW5J2VTGsJBqBlnfXGebIGczfv8gaHRleUAtp3BfJdhGjzCduMbvWZTKCDmXYjslXyN4QWUItter65U_PZnH7xAvpQ-DiCkltwaIeUZMTEgML68QLAVv_i0ow2g5JvAB526nPJIOw2pR-hKommlKAwkYsfmHMS1DUVT7wnTZ2DQ6gJ9shYbXtf_0qJho89FuhPJWUNJM837JWfcG-syP2hJKM5iVH6uaMtz3-ueIr9p_-7uXZjt3bM54BGrZmqt9_hC08u0x9YM1Ti6HuVfxmL4cEyvLOyIrY25aY7-HXC75T5hJDlc3uW8QYvQtT0LOXTdpjlKcpz7QvlAak_S_8Ry82vxlZMb6vxeGQTC4IxRXyMk4VrsxAes5cBnjmHgxxhH4n79DunxaKUKxuwaJpTbewBbykjBdQZKAJYN4OUiZWpGr1h_SDtfictDBDgy1yfBVm8v6tx26c0kkQKjpoSY0fQPWJid9YNZawUcUWgkkzGb-j1Ri3sRIphgGYM7PAs_w7Igm2ORXmkbvbgE901tduHQN0G0Z8syN47CiiZYy7QKTLPJrLGw8lpq4cFlfwfIcPWELn3rQvvHQNFnSExS89fVnJafjV4q6VD-kvY_zQ306OoE818XHglDpB30w85u_BkZ57zbZDyA90a-4JneEljiK7_i1YbGuYv0Jl5jcbcPNGjCARjKsRS5xljdwcBjil9Ck_qX_GiRw'></script></head>
+<body>
+<div class="game-container">
+    <div id="game-screen" class="screen active">
+        <div class="hud">
+            <div>❤️ 血量: <span id="hp">3</span>/3</div>
+            <div>🪙 金幣: <span id="coins">0</span></div>
+            <div>🏰 關卡: <span id="stage-name">古代商號</span></div>
+        </div>
+        <div class="progress-bar-container" aria-label="遊戲進度">
+            <div id="progress" class="progress-bar"></div>
+        </div>
+        <div id="story" class="story-box"></div>
+        <div id="question" class="question-box"></div>
+        <div id="options" class="options-container"></div>
+        <div id="feedback" class="feedback" aria-live="polite"></div>
+        <button id="next-btn" class="next-btn" type="button" onclick="nextQuestion()">前往下一題 ➔</button>
+    </div>
+
+    <div id="end-screen" class="screen center">
+        <h2 id="end-title"></h2>
+        <p id="end-desc"></p>
+        <p style="font-size: 1.5rem;">最終金幣：🪙 <span id="final-coins">0</span></p>
+        <button class="restart-btn" type="button" onclick="restartGame()">重新挑戰</button>
+    </div>
+</div>
+
+<script>
+    const questions = [
+        {
+            story: "📜 掌櫃正在愁眉苦臉地盤點絲綢，看到你便急忙前來求助...",
+            question: "「庫存原有一些絲綢，下午賣出 1.25 匹，傍晚又進貨相當於賣出量 2/3 的絲綢，最後庫存剩下 5.5 匹。最一開始庫存有多少匹？」",
+            options: ["6.75 匹", "5.92 匹", "6.33 匹", "4.25 匹"],
+            correct: 1,
+            reward: 100,
+            tip: "💡 逆向計算：原有量 = 5.5 − (1.25 × 2/3) + 1.25 = 5.916…，約為 5.92 匹。"
+        },
+        {
+            story: "💰 解決了絲綢問題，掌櫃帶你來到高檔瓷器櫃檯，商量定價策略。",
+            question: "「這件精美的瓷器打七五折出售後，仍可賺取成本的 20% 利潤。已知成本是 500 文，原本定價應該是多少文？」",
+            options: ["600 文", "750 文", "800 文", "1000 文"],
+            correct: 2,
+            reward: 150,
+            tip: "💡 先算售價：500 × 1.2 = 600 文。七五折售價是定價的 0.75，所以定價 = 600 ÷ 0.75 = 800 文。"
+        },
+        {
+            story: "🧪 商號後院正在調配防禦盜賊的煙霧彈，比例非常關鍵！",
+            question: "「煙霧彈需要硝石與硫磺的重量比為 5 : 3。現在已經稱好 45 克硫磺，需要加入多少克硝石？」",
+            options: ["27 克", "75 克", "60 克", "135 克"],
+            correct: 1,
+            reward: 120,
+            tip: "💡 硫磺的 3 份對應 45 克，放大了 45 ÷ 3 = 15 倍；硝石需要 5 × 15 = 75 克。"
+        },
+        {
+            story: "🔒 掌櫃非常器重你，決定交給你一個神秘的時空寶箱，但上面鎖著複雜的代數機關...",
+            question: "寶箱銘文寫著：「未知數 x 乘以 3，再減去 15，結果等於 45。」請問 x 是多少？",
+            options: ["x = 10", "x = 30", "x = 20", "x = 15"],
+            correct: 2,
+            reward: 200,
+            tip: "💡 列出方程式 3x − 15 = 45。兩邊加 15 得 3x = 60，再除以 3，x = 20。"
+        }
+    ];
+
+    let currentIdx = 0;
+    let hp = 3;
+    let coins = 0;
+    let answered = false;
+    let gameOver = false;
+    let endTimer = null;
+
+    function initGame() {
+        if (endTimer !== null) {
+            clearTimeout(endTimer);
+            endTimer = null;
+        }
+        currentIdx = 0;
+        hp = 3;
+        coins = 0;
+        answered = false;
+        gameOver = false;
+        document.getElementById('game-screen').classList.add('active');
+        document.getElementById('end-screen').classList.remove('active');
+        updateHUD();
+        showQuestion();
+    }
+
+    function updateHUD() {
+        document.getElementById('hp').textContent = hp;
+        document.getElementById('coins').textContent = coins;
+        const progressPercent = (currentIdx / questions.length) * 100;
+        document.getElementById('progress').style.width = progressPercent + '%';
+    }
+
+    function showQuestion() {
+        if (currentIdx >= questions.length) {
+            endGame(true);
+            return;
+        }
+
+        answered = false;
+        const q = questions[currentIdx];
+        document.getElementById('story').textContent = q.story;
+        document.getElementById('question').textContent = q.question;
+        const optionsDiv = document.getElementById('options');
+        optionsDiv.replaceChildren();
+
+        const feedbackDiv = document.getElementById('feedback');
+        feedbackDiv.className = 'feedback';
+        feedbackDiv.textContent = '';
+        const nextBtn = document.getElementById('next-btn');
+        nextBtn.style.display = 'none';
+        nextBtn.textContent = currentIdx === questions.length - 1 ? '完成冒險 ➔' : '前往下一題 ➔';
+
+        q.options.forEach((opt, idx) => {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'option-btn';
+            btn.textContent = opt;
+            btn.addEventListener('click', () => checkAnswer(idx));
+            optionsDiv.appendChild(btn);
+        });
+    }
+
+    function checkAnswer(selectedIdx) {
+        if (answered || gameOver) return;
+        answered = true;
+        const q = questions[currentIdx];
+        const feedbackDiv = document.getElementById('feedback');
+        document.querySelectorAll('.option-btn').forEach(btn => { btn.disabled = true; });
+
+        if (selectedIdx === q.correct) {
+            feedbackDiv.className = 'feedback correct';
+            feedbackDiv.textContent = `🎉 答對了！獲得 🪙 ${q.reward} 金幣！`;
+            coins += q.reward;
+        } else {
+            feedbackDiv.className = 'feedback wrong';
+            feedbackDiv.innerHTML = `❌ 答錯了！受到時空震盪傷害。<br><br>${q.tip}`;
+            hp--;
+        }
+
+        updateHUD();
+        const nextBtn = document.getElementById('next-btn');
+        if (hp <= 0) {
+            gameOver = true;
+            nextBtn.style.display = 'none';
+            endTimer = setTimeout(() => endGame(false), 2500);
+        } else {
+            nextBtn.style.display = 'block';
+        }
+    }
+
+    function nextQuestion() {
+        if (!answered || gameOver) return;
+        currentIdx++;
+        updateHUD();
+        showQuestion();
+    }
+
+    function endGame(isWin) {
+        if (endTimer !== null) {
+            clearTimeout(endTimer);
+            endTimer = null;
+        }
+        gameOver = true;
+        document.getElementById('game-screen').classList.remove('active');
+        document.getElementById('end-screen').classList.add('active');
+        document.getElementById('final-coins').textContent = coins;
+        document.getElementById('end-title').textContent = isWin ? '🎉 時空冒險成功！' : '💥 時空傳送失敗！';
+        document.getElementById('end-desc').textContent = isWin
+            ? '你成功解開所有謎題，穩定了時空矩陣！'
+            : '血量耗盡了。再練習一下數學公式，就能再次挑戰時空矩陣！';
+        if (isWin) {
+            document.getElementById('progress').style.width = '100%';
+        }
+    }
+
+    function restartGame() {
+        initGame();
+    }
+
+    initGame();
+</script>
+</body>
+</html>
